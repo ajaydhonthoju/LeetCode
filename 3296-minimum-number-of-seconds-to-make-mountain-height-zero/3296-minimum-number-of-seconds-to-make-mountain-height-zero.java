@@ -1,35 +1,37 @@
 class Solution {
     public long minNumberOfSeconds(int mountainHeight, int[] workerTimes) {
-        PriorityQueue<long[]> pq = new PriorityQueue<>((a,b) -> compare(a,b));
-        for (int i: workerTimes) {
-            long[] arr = {i, 0, 0}; // time multipler , nextTime, time taken so far
-            pq.offer(arr);
-        } 
+          long left = 0, right = Long.MAX_VALUE; 
+        while (left < right) {
+            long mid = left + (right - left) / 2;
+            if (canReduceHeight(mountainHeight, workerTimes, mid)) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return left;
+    }
 
-        for (int i = 0; i < mountainHeight; i++) {
-            long[] cur = pq.poll();
-            cur[2] += cur[1] + cur[0];
-            cur[1] += cur[0];
-            pq.offer(cur);
+    private boolean canReduceHeight(int mountainHeight, int[] workerTimes, long timeLimit) {
+        long totalReducedHeight = 0;
+
+        for (int workerTime : workerTimes) {
+            long maxHeight = 0;
+            long low = 0, high = (long) 1e6;
+            while (low < high) {
+                long mid = low + (high - low) / 2;
+                if (workerTime * (mid * (mid + 1)) / 2 <= timeLimit) {
+                    maxHeight = mid;
+                    low = mid + 1;
+                } else {
+                    high = mid;
+                }
+            }
+            totalReducedHeight += maxHeight;
+            if (totalReducedHeight >= mountainHeight) return true;
         }
-        long ans = 0;
-        while (!pq.isEmpty()) {
-            long[] cur = pq.poll();
-            ans = Math.max(ans, cur[2]);
-        }
-        return ans;
+
+        return totalReducedHeight >= mountainHeight;
     }
-    public int compare(long[] a, long[] b ) {
-        if (a[2] + a[1] + a[0] > b[2] + b[1] + b[0]) {
-            return 1;
-        }
-        else if (a[2] + a[1] + a[0] < b[2] + b[1] + b[0]) {
-            return -1;
-        }
-        if (a[0] > b[0]) {
-            return 1;
-        }
-        return -1;
-    }
-    
+
 }
