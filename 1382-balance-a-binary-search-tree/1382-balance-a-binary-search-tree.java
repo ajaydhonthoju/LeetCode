@@ -14,29 +14,25 @@
  * }
  */
 class Solution {
-    ArrayList<TreeNode> nodeList = new ArrayList<>();
     public TreeNode balanceBST(TreeNode root) {
-        getNodesList(root);
-        return BST(0 , nodeList.size() - 1);
+        ArrayList<Integer> k = new ArrayList<>();
+        inorder(root,k);
+        return bal(k, 0, k.size() - 1);
     }
-
-    TreeNode BST(int start,int end){
-        if(start > end) return null;
-
-        int mid = start + (end - start) / 2;
-        TreeNode root = nodeList.get(mid);
-
-        root.left = BST(start, mid - 1);
-        root.right = BST(mid + 1, end);
-
-        return root;
+    public void inorder(TreeNode root, ArrayList<Integer> k) {
+        if (root == null)
+            return;
+        inorder(root.left,k);
+        k.add(root.val);
+        inorder(root.right,k);
     }
-
-    void getNodesList(TreeNode node){
-        if(node == null) return;
-
-        getNodesList(node.left);
-        nodeList.add(node);   
-        getNodesList(node.right);
+    public TreeNode bal(ArrayList<Integer> k, int l ,int  r) {
+        if (l > r)
+            return null;
+        int m = (l + r) / 2;
+        TreeNode t = new TreeNode(k.get(m));
+        t.left = bal(k, l, m - 1);
+        t.right = bal(k, m + 1, r);
+        return t;
     }
 }
